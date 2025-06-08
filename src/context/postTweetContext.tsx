@@ -1,7 +1,16 @@
 "use client";
 
-import { createContext, use, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  use,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import axios from "axios";
+import { PaginationMeta } from "@/app/components/types";
+import { metadata } from "@/app/layout";
 
 interface PostTweetContextType {
   tweet?: string | null;
@@ -17,6 +26,11 @@ interface PostTweetContextType {
   ) => Promise<void>;
   fetchUserTweet: (idUser: string) => Promise<any>;
   fetchTweet: () => Promise<any>;
+  tweets: any[];
+  addNewTweet: (newTweet: any) => void;
+  isloadingFetch?: boolean;
+  lastPagereached?: boolean;
+  isErrorFetch?: boolean;
 }
 
 const PostTweetContext = createContext<PostTweetContextType | null>(null);
@@ -26,8 +40,19 @@ export const PostTweetProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [tweet, setTweet] = useState<string | null>(null);
+  // variables pour tweet loading et error dans le dahsboard dans home
+  const [tweets, setTweets] = useState<any[]>([]);
+  const [metadataPage, setMetadataPage] = useState<PaginationMeta | null>(null);
+  const [isloadingFetch, setIsLoadingFetch] = useState(false);
+  const [isErrorFetch, setIsErrorFetch] = useState(false);
+  const [lastPagereached, setLastPageReached] = useState(false);
+
+  // const [fetchloading, isLoadingFetch] = useState(false);
+
+  const pageRef = useRef(1);
+
   const [img, setImg] = useState<File | null>(null);
+  const [tweet, setTweet] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setIsError] = useState<string | null>(null);
   const posttweet = async (idUser: string) => {
@@ -49,7 +74,7 @@ export const PostTweetProvider = ({
         `${process.env.NEXT_PUBLIC_API_URL}/tweet/post-tweet`,
         formData
       );
-
+      addNewTweet(response.data);
       // clear just after posting
       setTweet(null);
       setImg(null);
@@ -76,20 +101,71 @@ export const PostTweetProvider = ({
     }
   };
 
+  const addNewTweet = (newTweet: any) => {
+    setTweets((prevTweets) => [newTweet, ...prevTweets]);
+  };
+
+  const isFetching = useRef(false);
+  // fonction de recuperation des tweets pour la page home
   const fetchTweet = async () => {
+    if (isFetching.current) {
+      console.log("Déjà en cours de fetch, on stoppe.");
+      return;
+    }
+    isFetching.current = true;
+
+    setIsLoadingFetch(true);
+    console.log("page actuelle: ", pageRef.current);
+
+    if (metadataPage && pageRef.current > metadataPage.lastPage) {
+      console.log("Fin de la pagination atteinte");
+      return;
+    }
+
     try {
+      // lancer la requête pour récupérer les tweets
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/tweet/all`
+        `${process.env.NEXT_PUBLIC_API_URL}/tweet/fetch-all-tweets/${pageRef.current}/10`
       );
-      return response.data;
+
+      if (response.status === 200) {
+        // visiualiser mes metatas et changer leurs etats
+        console.log("Réponse brute de l'API :", response.data);
+
+        const meta = response.data.tweets.meta;
+        console.log("Metadata récupérée :", meta);
+        setMetadataPage(meta);
+
+        if (pageRef.current > meta.lastPage) {
+          console.log("Fin de la pagination atteinte");
+          setLastPageReached(true);
+          setIsLoadingFetch(false);
+          isFetching.current = false;
+          return;
+        }
+
+        const fetchedPosts = response.data.tweets?.data || [];
+        setTweets((prev) => [...prev, ...fetchedPosts]);
+
+        // if (pageRef.current > meta.lastPage) {
+        //   console.log("Fin de la pagination atteinte");
+        //   isFetching.current = false;
+        //   return;
+        // } else {
+          pageRef.current += 1;
+        // }
+        setIsErrorFetch(false);
+      }
+
+      setIsErrorFetch(false);
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération de tous les tweets :",
-        error
-      );
-      throw new Error("Erreur lors de la récupération de tous les tweets");
+      setIsErrorFetch(true);
+    } finally {
+      isFetching.current = false;
+      setIsLoadingFetch(false);
     }
   };
+
   return (
     <PostTweetContext.Provider
       value={{
@@ -102,6 +178,11 @@ export const PostTweetProvider = ({
         posttweet,
         fetchUserTweet,
         fetchTweet,
+        addNewTweet,
+        tweets, // expose the tweets state
+        isloadingFetch,
+        lastPagereached,
+        isErrorFetch,
       }}
     >
       {children}

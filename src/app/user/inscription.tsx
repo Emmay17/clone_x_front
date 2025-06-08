@@ -7,11 +7,13 @@ import Loader from "../components/loader";
 export default function Inscription() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    username: "",
     email: "",
-    dateOfBirth: "",
+    birthdayDate: "",
     password: "",
-    confirmPassword: "",
+    password_connfirmation: "",
   });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -69,11 +71,13 @@ export default function Inscription() {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         {
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          username: formData.username,
           email: formData.email,
-          dateOfBirth: formData.dateOfBirth,
+          birthdayDate: formData.birthdayDate,
           password: formData.password,
-          confirmPassword: formData.confirmPassword,
+          password_confirmation: formData.password_connfirmation,
         },
         {
           headers: {
@@ -128,12 +132,23 @@ export default function Inscription() {
                 <input
                   className="border border-white rounded-md p-4"
                   type="text"
-                  placeholder="Name"
-                  value={formData.name}
+                  placeholder="First name"
+                  value={formData.firstName}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, firstName: e.target.value })
                   }
                 />
+
+                <input
+                  className="border border-white rounded-md p-4"
+                  type="text"
+                  placeholder="Last name"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                />
+
                 <input
                   className="border border-white rounded-md p-4"
                   type="email"
@@ -154,6 +169,10 @@ export default function Inscription() {
                 <input
                   className="border border-white rounded-md p-4"
                   type="date"
+                  value={formData.birthdayDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, birthdayDate: e.target.value })
+                  } // Note: conChange should be onChange
                 />
               </div>
             </div>
@@ -162,6 +181,16 @@ export default function Inscription() {
         {step === 2 && (
           <>
             <div className="flex flex-col gap-4 mt-4">
+              <input
+                className="border border-white rounded-md p-4"
+                type="text"
+                placeholder="username"
+                value={formData.username}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
+              />
+
               <input
                 className="border border-white rounded-md p-4"
                 type="password"
@@ -176,9 +205,12 @@ export default function Inscription() {
                 className="border border-white rounded-md p-4"
                 type="password"
                 placeholder="confirmation password"
-                value={formData.confirmPassword}
+                value={formData.password_connfirmation}
                 onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
+                  setFormData({
+                    ...formData,
+                    password_connfirmation: e.target.value,
+                  })
                 }
               />
             </div>
@@ -220,7 +252,7 @@ export default function Inscription() {
               }
               icon={undefined}
               onClick={() => console.log("Publié !")}
-              className="h-[3rem]"
+              className="h-[3rem] cursor-pointer"
               type="submit"
             />
           </>

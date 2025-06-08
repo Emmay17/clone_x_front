@@ -8,15 +8,11 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function ProfileLayout({
-  children,
-}: {
-  children: React.ReactNode;
-  params: { username: string };
-}) {
+export default function ProfileLayout({children}: {children: React.ReactNode}) {
   const { user, profile, isLoading, isError } = useUserContext();
   // const {}
   const pathname = usePathname();
+
 
   if (isLoading) {
     return (

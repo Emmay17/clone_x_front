@@ -104,8 +104,7 @@ export default function PostArticle(props: PostArticleProps) {
           {/* user name and username and time */}
           <div className="flex gap-1">
             <span className="text-white font-semibold">
-              {firstName}
-              {lastName}
+              {firstName} {lastName}
             </span>
             {isVerified && <img src="/icons/Verified.svg" alt="" />}
             <span className="text-gray-500">@{username}</span>
@@ -150,7 +149,7 @@ export default function PostArticle(props: PostArticleProps) {
           <button className="flex gap-1 items-center">
             <img
               src="/icons/Retweet.svg"
-              alt="comment"
+              alt="retweet"
               className="w-[18.75px] h-[18.75px]"
             />
             <span>{retweetCount}</span>
