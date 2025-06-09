@@ -31,6 +31,7 @@ interface PostTweetContextType {
   isloadingFetch?: boolean;
   lastPagereached?: boolean;
   isErrorFetch?: boolean;
+  metadataPage?: PaginationMeta | null;
 }
 
 const PostTweetContext = createContext<PostTweetContextType | null>(null);
@@ -55,6 +56,8 @@ export const PostTweetProvider = ({
   const [tweet, setTweet] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setIsError] = useState<string | null>(null);
+  const isFetching = useRef(false);
+
   const posttweet = async (idUser: string) => {
     if (!tweet && !img) {
       setIsError("Veuillez saisir un tweet ou ajouter une image.");
@@ -74,7 +77,8 @@ export const PostTweetProvider = ({
         `${process.env.NEXT_PUBLIC_API_URL}/tweet/post-tweet`,
         formData
       );
-      addNewTweet(response.data);
+      console.log(response.data);
+      addNewTweet(response.data.data);
       // clear just after posting
       setTweet(null);
       setImg(null);
@@ -84,6 +88,13 @@ export const PostTweetProvider = ({
       setIsLoading(false);
     }
   };
+  
+  const addNewTweet = (newTweet: any) => {
+    setTweets((prevTweets) => [newTweet, ...prevTweets]);
+    // metadataPage?.total += 1 ;
+
+  };
+  
   const fetchUserTweet = async (idUser: string) => {
     try {
       const response = await axios.get(
@@ -100,12 +111,6 @@ export const PostTweetProvider = ({
       );
     }
   };
-
-  const addNewTweet = (newTweet: any) => {
-    setTweets((prevTweets) => [newTweet, ...prevTweets]);
-  };
-
-  const isFetching = useRef(false);
   // fonction de recuperation des tweets pour la page home
   const fetchTweet = async () => {
     if (isFetching.current) {
@@ -183,6 +188,7 @@ export const PostTweetProvider = ({
         isloadingFetch,
         lastPagereached,
         isErrorFetch,
+        metadataPage,
       }}
     >
       {children}

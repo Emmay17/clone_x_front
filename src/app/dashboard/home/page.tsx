@@ -43,6 +43,7 @@ export default function HomePage() {
       observateur.current?.observe(lastObservedObject.current);
     }
   }, [tweets]);
+
   return (
     <div className="w-full h-screen flex md:gap-x-5 box-border overflow-hidden">
       <section className="md:basis-1/2 flex-1 md:border-r border-gray-500 h-screen overflow-y-auto pb-[3rem] md:pb-0">
@@ -77,7 +78,7 @@ export default function HomePage() {
               username={post.user?.profile?.username}
               content={post?.content}
               tweetImage={post.medias?.[0]?.url}
-              createdAt={new Date(post?.createdAt).toLocaleDateString()}
+              createdAt={post?.createdAt}
               likeCount={post?.likesCount}
               commentCount={post?.repliesCount}
               retweetCount={post?.retweetsCount}

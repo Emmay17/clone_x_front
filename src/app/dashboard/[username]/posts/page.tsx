@@ -42,9 +42,9 @@ export default function Postes() {
             tweetImage={tweet.medias.length > 0 ? tweet.medias[0].url : null}
             content={tweet.content}
             createdAt={tweet.createdAt}
-            likeCount={tweet.likescount}
-            commentCount={tweet.commentCount}
-            retweetCount={tweet.retweetCount}
+            likeCount={tweet.likesCount}
+            commentCount={tweet.repliesCount}
+            retweetCount={tweet.retweetsCount}
             isVerified={tweet.user.profile.isVerified}
           />
         ))

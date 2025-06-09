@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { usePostTweetContext } from "@/context/postTweetContext";
 
 export default function ProfileLayout({children}: {children: React.ReactNode}) {
   const { user, profile, isLoading, isError } = useUserContext();
+  const {metadataPage} = usePostTweetContext();
   // const {}
   const pathname = usePathname();
 
@@ -83,7 +85,7 @@ export default function ProfileLayout({children}: {children: React.ReactNode}) {
                 {profile.firstName} {profile.lastName}
               </p>
               <span className="text-gray-500 font-light text-sm/8">
-                0 postes
+                {metadataPage?.total} postes
               </span>
             </div>
           }

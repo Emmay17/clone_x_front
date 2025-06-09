@@ -23,10 +23,17 @@ function formatTweetDate(dateString: string) {
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
 
+  console.log("now:", new Date().toISOString());
+console.log("createdAt:", dateString);
+console.log("diffMs:", diffMs);
+
+
   const seconds = Math.floor(diffMs / 1000);
   const minutes = Math.floor(diffMs / (1000 * 60));
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+console.log("seconds:", seconds);
+
 
   if (seconds < 60) return "à l'instant";
   if (minutes < 60) return `${minutes}m`;
@@ -108,7 +115,7 @@ export default function PostArticle(props: PostArticleProps) {
             </span>
             {isVerified && <img src="/icons/Verified.svg" alt="" />}
             <span className="text-gray-500">@{username}</span>
-            <span className="text-gray-500">·</span>
+            <span className="text-gray-500 font-bold">·</span>
             <span className="text-gray-500">{formattedDate}</span>
           </div>
           {/* button ...  */}
