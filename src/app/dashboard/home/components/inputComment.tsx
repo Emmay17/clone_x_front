@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePostTweetContext } from "@/context/postTweetContext";
 import Loader from "@/app/components/loader";
 
-export default function InputTweet() {
+export default function InputComment() {
   const autoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "auto";
     e.target.style.height = e.target.scrollHeight + "px";
@@ -59,24 +59,37 @@ export default function InputTweet() {
   };
 
   return (
-    <div className="hidden md:flex h-screen md:h-auto gap-1 md:gap-5 md:p-4 md:border-b border-gray-500 overflow-y-auto">
-      <div className="relative w-12 h-12 p-4  rounded-full overflow-hidden ">
-        <Image
-          src={
-            profile.profileImage ||
-            "https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png"
-          }
-          fill
-          loading="lazy"
-          alt="user image profile"
-          className="object-cover"
-        />
-      </div>
-
+    <div className="hidden md:flex h-screen md:h-auto gap-1 md:gap-5 md:p-4  border-gray-500 overflow-y-auto">
       <form
         className="w-full flex flex-col justify-between gap-4 overflow-y-auto"
         onSubmit={handleSubmit}
       >
+        
+
+        <div className="flex flex-row gap-2 w-full justify-center items-center">
+          <div className="relative w-10 h-10 p-4  rounded-full overflow-hidden ">
+            <Image
+              src={
+                profile.profileImage ||
+                "https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png"
+              }
+              fill
+              loading="lazy"
+              alt="user image profile"
+              className="object-cover"
+            />
+          </div>
+          <textarea
+            className="w-full resize-none max-h-180 overflow-y-auto focus:outline-none focus:ring-0 focus:border-none border-none"
+            name="tweet"
+            id="inputTweet"
+            placeholder="Post your reply"
+            onInput={autoGrow}
+            onChange={(e) => setTweet(e.target.value)}
+            value={tweet ?? ""}
+          ></textarea>
+        </div>
+
         {preview && (
           <div className="w-full aspect-[16/9] h-auto rounded-md overflow-hidden">
             <img
@@ -87,15 +100,7 @@ export default function InputTweet() {
             />
           </div>
         )}
-        <textarea
-          className="w-full resize-none max-h-180 overflow-y-auto focus:outline-none focus:ring-0 focus:border-none border-none"
-          name="tweet"
-          id="inputTweet"
-          placeholder="What's happening?"
-          onInput={autoGrow}
-          onChange={(e) => setTweet(e.target.value)}
-          value={tweet ?? ""}
-        ></textarea>
+
         <input
           type="file"
           id="fileInput"

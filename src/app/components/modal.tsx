@@ -6,7 +6,7 @@ interface ModalProps {
 export default function Modal({ isOpen, onClose, children }: ModalProps) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-[rgba(255,255,255,0.2)] flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-[rgba(255,255,255,0.2)] flex items-center h-screen justify-center z-50 overflow-y-auto">
       <div className="bg-black w-full h-full md:h-auto p-6 box-border rounded-lg shadow-lg relative w-[90%] max-w-md">
         <button
           onClick={onClose}

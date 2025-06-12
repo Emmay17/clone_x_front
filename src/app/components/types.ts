@@ -85,3 +85,24 @@ export interface PaginationMeta {
   nextPageUrl: string | null;
   previousPageUrl: string | null;
 }
+
+export interface PostArticleProps {
+  profileImage: string; // URL de la photo de profil
+  firstName: string;
+  lastName: string;
+  username: string; // @pseudo
+  content: string;
+  isVerified: boolean;
+  tweetImage?: string; // optionnel : peut ne pas exister
+  createdAt: string; // ou Date
+  likeCount: number;
+  commentCount: number;
+  retweetCount: number;
+  onReply?: () => void;
+  onRetweet?: () => void;
+  onLike?: () => void;
+  onShare?: () => void;
+  tweetId: number;
+  userId: string;
+  hasliked: boolean;
+}

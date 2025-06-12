@@ -1,39 +1,18 @@
+import { useCommentModal } from "@/context/commentTweetContext";
+import axios from "axios";
 import { useState, useEffect } from "react";
-
-interface PostArticleProps {
-  profileImage: string; // URL de la photo de profil
-  firstName: string;
-  lastName: string;
-  username: string; // @pseudo
-  content: string;
-  isVerified: boolean;
-  tweetImage?: string; // optionnel : peut ne pas exister
-  createdAt: string; // ou Date
-  likeCount: number;
-  commentCount: number;
-  retweetCount: number;
-  onReply?: () => void;
-  onRetweet?: () => void;
-  onLike?: () => void;
-  onShare?: () => void;
-}
+import { PostArticleProps } from "./types";
+import Image from "next/image";
 
 function formatTweetDate(dateString: string) {
   const now = new Date();
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
 
-  console.log("now:", new Date().toISOString());
-console.log("createdAt:", dateString);
-console.log("diffMs:", diffMs);
-
-
   const seconds = Math.floor(diffMs / 1000);
   const minutes = Math.floor(diffMs / (1000 * 60));
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-console.log("seconds:", seconds);
-
 
   if (seconds < 60) return "à l'instant";
   if (minutes < 60) return `${minutes}m`;
@@ -58,6 +37,7 @@ console.log("seconds:", seconds);
     return date.toLocaleDateString("fr-FR", optionsOtherYear);
   }
 }
+// export const [showCommentModal, setshowCommentModal] = useState(false);
 
 export default function PostArticle(props: PostArticleProps) {
   const {
@@ -72,11 +52,45 @@ export default function PostArticle(props: PostArticleProps) {
     isVerified,
     commentCount,
     retweetCount,
+    hasliked,
     onReply,
     onRetweet,
     onLike,
     onShare,
+    tweetId,
+    userId,
   } = props;
+
+  const [isLiked, setIsLiked] = useState(hasliked ?? false);
+  const [likeCountState, setLikeCountState] = useState(Number(likeCount));
+  const { showCommentModal, setShowCommentModal } = useCommentModal();
+
+  async function likeUnlike(id: number, idUser: string) {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/likes/likeUnlike-tweet/${id}/user/${idUser}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+      const message = response.data.message;
+
+      if (message.includes("Like ajouté avec succès")) {
+        setIsLiked(true);
+        setLikeCountState((prev) => prev + 1);
+        console.log("Like ajouté avec succès");
+      } else if (message.includes("like supprimé avec succès")) {
+        setIsLiked(false);
+        setLikeCountState((prev) => prev - 1);
+        console.log("like supprimé avec succès");
+      }
+    } catch (error) {
+      console.log("Erreur lors de la requête de like/unlike :", error);
+    }
+  }
 
   const [formattedDate, setFormattedDate] = useState(() =>
     formatTweetDate(createdAt)
@@ -93,16 +107,16 @@ export default function PostArticle(props: PostArticleProps) {
   return (
     <article className="flex gap-2 p-4 w-full border-b border-gray-500">
       {/* user image profile */}
-      <div className="aspect-square flex">
-        {}
-        <img
+      <div className="relative w-12 h-12 p-4 rounded-full overflow-hidden ">
+        <Image
           src={
             profileImage ||
             "https://upload.wikimedia.org/wikipedia/commons/0/03/Twitter_default_profile_400x400.png"
           }
-          alt=""
-          className="w-10 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover"
+          fill
           loading="lazy"
+          alt="user image profile"
+          className="object-cover"
         />
       </div>
       {/* left part */}
@@ -119,7 +133,7 @@ export default function PostArticle(props: PostArticleProps) {
             <span className="text-gray-500">{formattedDate}</span>
           </div>
           {/* button ...  */}
-          <div>
+          <div className=" cursor-pointer">
             {/* <img src="" alt="" /> */}
             <img src="/icons/More-2.svg" alt="" />
           </div>
@@ -144,36 +158,50 @@ export default function PostArticle(props: PostArticleProps) {
 
         {/* Tweet reactions */}
         <div className="flex justify-between text-gray-500 mt-2 text-sm w-full">
-          <button className="flex gap-1 items-center">
+          <button
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={() => {
+              setShowCommentModal(true);
+            }}
+          >
             <img
-              src="/icons/Reply.svg"
+              src="/icons/Reply copy.svg"
               alt="comment"
               className="w-[18.75px] h-[18.75px]"
             />
             <span>{commentCount}</span>
           </button>
 
-          <button className="flex gap-1 items-center">
+          <button
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={onRetweet}
+          >
             <img
-              src="/icons/Retweet.svg"
+              src="/icons/Vector.svg"
               alt="retweet"
               className="w-[18.75px] h-[18.75px]"
             />
             <span>{retweetCount}</span>
           </button>
 
-          <button className="flex gap-1 items-center">
+          <button
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={() => likeUnlike(tweetId, userId)}
+          >
             <img
-              src="/icons/React.svg"
+              src={isLiked ? "/icons/liked.svg" : "/icons/Vector-1.svg"}
               alt="comment"
               className="w-[18.75px] h-[18.75px]"
             />
-            <span>{likeCount}</span>
+            <span>{likeCountState}</span>
           </button>
 
-          <button className="flex gap-1 items-center">
+          <button
+            className="flex gap-1 items-center cursor-pointer"
+            onClick={onShare}
+          >
             <img
-              src="/icons/Share.svg"
+              src="/icons/Share copy.svg"
               alt="comment"
               className="w-[18.75px] h-[18.75px]"
             />

@@ -8,13 +8,18 @@ import InputTweet from "./components/inputTweet";
 import { useEffect, useRef, useState } from "react";
 import Loader from "@/app/components/loader";
 import { usePostTweetContext } from "@/context/postTweetContext";
+import { useCommentModal } from "@/context/commentTweetContext";
+import Modal from "@/app/components/modal";
+import CommentsView from "./components/commentView";
 
 export default function HomePage() {
   // mes indicateurs pour reperer la fin du scroll
   const observateur = useRef<IntersectionObserver | null>(null);
   const lastObservedObject = useRef<HTMLDivElement | null>(null);
+  const { showCommentModal, setShowCommentModal } = useCommentModal();
 
-  const { fetchTweet, tweets, lastPagereached, isErrorFetch, isloadingFetch} = usePostTweetContext();
+  const { fetchTweet, tweets, lastPagereached, isErrorFetch, isloadingFetch } =
+    usePostTweetContext();
   // const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -83,27 +88,37 @@ export default function HomePage() {
               commentCount={post?.repliesCount}
               retweetCount={post?.retweetsCount}
               isVerified={post.user?.isVerified}
+              hasliked={post?.hasLiked}
+              tweetId={post.id}
+              userId={post.user?.id}
             />
           ))
         )}
 
-        {
-          !lastPagereached ? (
-            <div className="flex justify-center items-center p-10">
-              <Loader />
-            </div>
-          ) : isErrorFetch ? (
-            <p className="text-red-500 text-center mt-4">
-              Une erreur est survenue lors du chargement des tweets.
-            </p>
-          ) : <p className="text-gray-500 text-center mt-4">
-              Plus de tweets à afficher.
-            </p>
-        }
+        {!lastPagereached ? (
+          <div className="flex justify-center items-center p-10">
+            <Loader />
+          </div>
+        ) : isErrorFetch ? (
+          <p className="text-red-500 text-center mt-4">
+            Une erreur est survenue lors du chargement des tweets.
+          </p>
+        ) : (
+          <p className="text-gray-500 text-center mt-4">
+            Plus de tweets à afficher.
+          </p>
+        )}
         <div ref={lastObservedObject} style={{ height: "3rem" }}></div>
+
+        <Modal
+          isOpen={showCommentModal}
+          onClose={() => setShowCommentModal(false)}
+        >
+          <CommentsView {...tweets[0]?.id} />
+        </Modal>
       </section>
 
-      <section className="hidden md:block basis-[45%] bg-blue-500/5">
+      <section className="hidden lg:block basis-[45%] bg-blue-500/5">
         <RightSearch />
       </section>
     </div>

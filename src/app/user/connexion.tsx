@@ -8,17 +8,19 @@ export default function Connexion() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(""); // Réinitialise l’erreur
+    setSuccessMessage("");
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         email,
         password,
       });
       if (response.status === 200) {
-        setErrorMessage(response.data.message);
+        setSuccessMessage(response.data.message);
         const { token, user } = response.data;
         localStorage.setItem("auth_token", token.token);
         localStorage.setItem("user", JSON.stringify(user));
@@ -94,6 +96,11 @@ export default function Connexion() {
         {errorMessage && (
           <div className="bg-red-500 text-white p-2 rounded-md">
             {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-500 text-white p-2 rounded-md">
+            {successMessage}
           </div>
         )}
         <button

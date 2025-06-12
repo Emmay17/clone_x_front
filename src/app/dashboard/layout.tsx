@@ -6,14 +6,15 @@ import Modal from "../components/modal";
 import InputTweet from "./home/components/inputTweet";
 import { useUserContext, UserProvider } from "@/context/userContext";
 import Loader from "../components/loader";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { PostTweetProvider } from "@/context/postTweetContext";
+import { CommentModalProvider } from "@/context/commentTweetContext";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user, profile, isLoading, isError } = useUserContext();
   const [showModal, setShowModal] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState("Home");
-
+  const router = useRouter();
   if (isLoading) {
     return (
       <div className="flex flex-col w-screen h-screen justify-center items-center">
@@ -23,7 +24,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }
 
   if (isError) {
-    redirect("/");
+    router.push("/");
   }
 
   return (
@@ -63,7 +64,9 @@ export default function DashboardLayout({
   return (
     <UserProvider>
       <PostTweetProvider>
-        <DashboardContent>{children}</DashboardContent>
+        <CommentModalProvider>
+          <DashboardContent>{children}</DashboardContent>
+        </CommentModalProvider>
       </PostTweetProvider>
     </UserProvider>
   );

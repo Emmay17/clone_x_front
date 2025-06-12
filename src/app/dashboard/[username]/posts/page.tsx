@@ -43,9 +43,12 @@ export default function Postes() {
             content={tweet.content}
             createdAt={tweet.createdAt}
             likeCount={tweet.likesCount}
+            hasliked={tweet.hasLiked}
             commentCount={tweet.repliesCount}
             retweetCount={tweet.retweetsCount}
             isVerified={tweet.user.profile.isVerified}
+            tweetId={tweet.id}
+            userId={tweet.user.id}
           />
         ))
       )}

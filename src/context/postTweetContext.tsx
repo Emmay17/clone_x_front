@@ -88,17 +88,20 @@ export const PostTweetProvider = ({
       setIsLoading(false);
     }
   };
-  
+
   const addNewTweet = (newTweet: any) => {
     setTweets((prevTweets) => [newTweet, ...prevTweets]);
     // metadataPage?.total += 1 ;
-
   };
-  
+
   const fetchUserTweet = async (idUser: string) => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/tweet/fetch-tweets/${idUser}`
+        `${process.env.NEXT_PUBLIC_API_URL}/tweet/fetch-tweets/${idUser}`,{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
       );
       return response.data;
     } catch (error) {
@@ -111,6 +114,7 @@ export const PostTweetProvider = ({
       );
     }
   };
+
   // fonction de recuperation des tweets pour la page home
   const fetchTweet = async () => {
     if (isFetching.current) {
@@ -128,9 +132,16 @@ export const PostTweetProvider = ({
     }
 
     try {
+
+      console.log("le tokenn"+localStorage.getItem("auth_token"));
       // lancer la requête pour récupérer les tweets
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/tweet/fetch-all-tweets/${pageRef.current}/10`
+        `${process.env.NEXT_PUBLIC_API_URL}/tweet/fetch-all-tweets/${pageRef.current}/10`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
       );
 
       if (response.status === 200) {
@@ -151,15 +162,10 @@ export const PostTweetProvider = ({
 
         const fetchedPosts = response.data.tweets?.data || [];
         setTweets((prev) => [...prev, ...fetchedPosts]);
-
-        // if (pageRef.current > meta.lastPage) {
-        //   console.log("Fin de la pagination atteinte");
-        //   isFetching.current = false;
-        //   return;
-        // } else {
-          pageRef.current += 1;
-        // }
+        pageRef.current += 1;
         setIsErrorFetch(false);
+      }else{
+        setIsLoadingFetch(false)
       }
 
       setIsErrorFetch(false);

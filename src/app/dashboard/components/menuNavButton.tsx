@@ -12,7 +12,7 @@ export default function MenuNavButton({
   return (
     <div
       onClick={onClick}
-      className="flex justify-center items-center md:gap-3 cursor-pointer rounded-full hover:bg-gray-200/10 px-4 py-2 md:px-4"
+      className="flex justify-center items-center md:gap-3 cursor-pointer rounded-full w-full lg:w-auto hover:bg-gray-200/10 px-4 py-2 md:px-4"
     >
       <img
         src={icone}

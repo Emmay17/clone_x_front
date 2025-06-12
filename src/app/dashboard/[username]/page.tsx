@@ -1,6 +1,7 @@
 // app/[username]/page.tsx
-"use client";
+// "use client";
 import { redirect } from 'next/navigation';
+import { use } from 'react';
 
 interface Props {
   params: {
